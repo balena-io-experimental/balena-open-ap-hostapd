@@ -1,5 +1,7 @@
 FROM resin/%%RESIN_MACHINE_NAME%%-debian:latest
 
+WORKDIR /usr/src/app
+
 RUN apt-get -q update && \
     apt-get install -yq --no-install-recommends \
     	    net-tools \
@@ -16,14 +18,16 @@ RUN apt-get -q update && \
 	    wpasupplicant \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-COPY . /app
+COPY . ./
 
-RUN chmod +x /app/init-open-ap.sh
+RUN chmod +x init-open-ap.sh
 
-RUN mv /etc/udhcpd.conf /etc/udhcpd.conf.bak && cp /app/config/udhcpd.conf /etc/udhcpd.conf
+RUN mv /etc/udhcpd.conf /etc/udhcpd.conf.bak && \
+    cp config/udhcpd.conf /etc/udhcpd.conf
 
-RUN mv /etc/default/udhcpd /etc/default/udhcpd.bak && cp /app/config/udhcpd /etc/default/udhcpd
+RUN mv /etc/default/udhcpd /etc/default/udhcpd.bak && \
+    cp config/udhcpd /etc/default/udhcpd
 
-RUN cp /app/config/hostapd.conf /etc/hostapd/hostapd.conf
+RUN cp config/hostapd.conf /etc/hostapd/hostapd.conf
 
-CMD ["/app/init-open-ap.sh"]
+CMD ["./init-open-ap.sh"]
